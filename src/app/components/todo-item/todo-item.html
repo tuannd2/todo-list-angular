@@ -1,0 +1,11 @@
+<div class="todo-item" [attr.data-priority]="item().priority" [class.highlight]="isHighlighted()"
+    [class.completed]="item().isCompleted" [title]="item().description" [attr.data-has-desc]="!!item().description">
+
+    <div class="summary">
+        {{ item().summary }}
+    </div>
+
+    <div>
+        Due Date: {{ formattedDeadline}}
+    </div>
+</div>

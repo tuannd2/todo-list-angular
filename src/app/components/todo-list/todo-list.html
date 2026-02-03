@@ -1,0 +1,9 @@
+<section class="todo-list">
+    @for (item of unfinishedItems(); track item.id) {
+    <app-todo-item [item]="item" />
+    }
+
+    @for (item of finishedItems(); track item.id) {
+    <app-todo-item [item]="item" [completed]=true />
+    }
+</section>
