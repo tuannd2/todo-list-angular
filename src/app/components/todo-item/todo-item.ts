@@ -27,14 +27,15 @@ export class TodoItem {
     return formatter.format(this.item().completeBy);
   }
 
-  isHighlighted(): boolean {
-    if (this.item().isCompleted || this.item().priority !== 1 || !this.item().completeBy) {
-      return false;
-    }
+  get deadlineState(): 'normal' | 'highlight' | 'overdue' {
+    if (this.item().isCompleted || !this.item().completeBy) return 'normal';
 
     const diff = this.item().completeBy.getTime() - Date.now();
 
-    return diff <= DAY;
+    if (diff < 0) return 'overdue';
+    if (diff <= DAY) return 'highlight';
+
+    return 'normal';
   }
 
   startEdit() {

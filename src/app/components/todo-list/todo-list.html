@@ -1,8 +1,13 @@
 <section class="todo-list">
-    <button (click)="startCreate()">Add new</button>
+    <div style="margin-bottom: 30px;">
+        @if (isCreating() && !editingId()) {
+        <app-todo-form (done)="cancelCreate()" />}
 
-    @if (isCreating()) {
-    <app-todo-form (done)="cancelCreate()" />}
+        @else {<button class="add-new-btn" (click)="startCreate()">
+            <span class="icon">✚</span>
+            Add new
+        </button>}
+    </div>
 
     @for (item of unfinishedItems(); track item.id) {
     @if (editingId() === item.id) {

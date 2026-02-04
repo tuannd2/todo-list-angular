@@ -1,11 +1,12 @@
-<div class="todo-item" [attr.data-priority]="item().priority" [class.highlight]="isHighlighted()"
-    [class.completed]="item().isCompleted" [title]="item().description" [attr.data-has-desc]="!!item().description">
+<div class="todo-item" [attr.data-priority]="item().priority" [class.highlight]="deadlineState === 'highlight'"
+    [class.overdue]="deadlineState === 'overdue'" [class.completed]="item().isCompleted" [title]="item().description"
+    [attr.data-has-desc]="!!item().description">
 
     <div class="summary">
         {{ item().summary }}
     </div>
 
-    <div>
+    <div class="due-date">
         Due Date: {{ formattedDeadline}}
     </div>
 

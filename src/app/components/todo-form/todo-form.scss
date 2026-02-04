@@ -3,9 +3,9 @@
 
 .todo-form {
     background: $card-bg;
-    border: 1px dashed color.adjust($card-border, $lightness: 10%);
+    border: 1px dashed color.adjust($card-border, $lightness: 2%);
     border-radius: 14px;
-    padding: 14px 28px 16px;
+    padding: 20px 24px;
     box-shadow: $shadow-soft;
 
     display: grid;
@@ -34,10 +34,6 @@
         &::placeholder {
             color: #9ca3af;
         }
-    }
-
-    input[type="date"] {
-        padding-right: 8px;
     }
 
     button {
