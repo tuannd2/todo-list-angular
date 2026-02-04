@@ -1,6 +1,7 @@
+import { DAY } from '../constant';
 import { TodoModel } from '../models/todo.model';
 
-const addDays = (d: number) => new Date(new Date().getTime() + d * 24 * 60 * 60 * 1000);
+const addDays = (d: number) => new Date(new Date().getTime() + d * DAY);
 
 export const TODO_MOCK_DATA: TodoModel[] = [
   {

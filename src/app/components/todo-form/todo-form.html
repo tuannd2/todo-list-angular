@@ -1,0 +1,21 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="todo-form">
+    <input type="text" placeholder="Summary" formControlName="summary" />
+
+    <input type="text" placeholder="Description" formControlName="description" />
+
+    <select formControlName="priority">
+        <option [value]="PRIORITY.HIGH">High</option>
+        <option [value]="PRIORITY.MEDIUM">Medium</option>
+        <option [value]="PRIORITY.LOW">Low</option>
+    </select>
+
+    <input type="date" formControlName="completeBy" />
+
+    <button type="submit" [disabled]="form.invalid">
+        Save
+    </button>
+
+    <button type="button" (click)="done.emit()">
+        Cancel
+    </button>
+</form>

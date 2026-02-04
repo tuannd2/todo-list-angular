@@ -1,6 +1,17 @@
 <section class="todo-list">
+    <button (click)="startCreate()">Add new</button>
+
+    @if (isCreating()) {
+    <app-todo-form (done)="cancelCreate()" />}
+
     @for (item of unfinishedItems(); track item.id) {
-    <app-todo-item [item]="item" />
+    @if (editingId() === item.id) {
+    <app-todo-form [todo]="item" (done)="cancelEdit()" />
+    }
+
+    @else {
+    <app-todo-item [item]="item" (edit)="startEdit(item.id)" />
+    }
     }
 
     @for (item of finishedItems(); track item.id) {

@@ -8,4 +8,20 @@
     <div>
         Due Date: {{ formattedDeadline}}
     </div>
+
+    <div class="actions">
+        <button class="actions-btn" (click)="startEdit()">✎</button>
+
+        @if (!item().isCompleted) {
+        <button class="actions-btn" (click)="markCompleted()">✔</button>
+        }
+
+        @if (!item().isCompleted) {
+        <button class="actions-btn" (click)="deleteItem()">✖</button>
+        }
+    </div>
+
+    @if (item().isCompleted) {
+    <button class="actions-btn undo-btn" (click)="undoCompleted()">↩</button>
+    }
 </div>

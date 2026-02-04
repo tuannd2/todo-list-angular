@@ -1,5 +1,5 @@
 import { computed, Injectable, signal } from '@angular/core';
-import { TodoModel } from '../models/todo.model';
+import { TodoModel, UpdateTodoModel } from '../models/todo.model';
 import { TODO_MOCK_DATA } from '../mocks/todo.mock';
 
 @Injectable({
@@ -22,23 +22,20 @@ export class TodoService {
 
   readonly finishedItems = computed(() => this.items().filter((i) => i.isCompleted));
 
-  create(item: Omit<TodoModel, 'id' | 'isCompleted'>): boolean {
-    try {
-      this._items.update((items) => [
-        ...items,
-        {
-          ...item,
-          id: crypto.randomUUID(),
-          isCompleted: false,
-        },
-      ]);
-      return true;
-    } catch {
-      return false;
+  create(item: Omit<TodoModel, 'id' | 'isCompleted'>) {
+    const newItem = {
+      ...item,
+      id: crypto.randomUUID(),
+      isCompleted: false,
     }
+
+    this._items.update((items) => [
+      ...items,
+      newItem,
+    ]);
   }
 
-  update(id: string, changes: Partial<TodoModel>) {
+  update(id: string, changes: UpdateTodoModel) {
     this._items.update((items) => items.map((i) => (i.id === id ? { ...i, ...changes } : i)));
   }
 
@@ -48,8 +45,18 @@ export class TodoService {
     });
   }
 
+  undoCompleted(id: string) {
+    if (confirm('Are you sure you want to mark this item as unfinished?')) {
+      this.update(id, {
+        isCompleted: false,
+      });
+    }
+  }
+
   delete(id: string) {
-    this._items.update((items) => items.filter((i) => i.id !== id));
+    if (confirm('Are you sure you want to delete this item?')) {
+      this._items.update((items) => items.filter((i) => i.id !== id));
+    }
   }
 
   private sortFn(a: TodoModel, b: TodoModel): number {

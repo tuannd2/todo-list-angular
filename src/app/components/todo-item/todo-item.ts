@@ -1,6 +1,7 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { TodoService } from '../../services/todo.service';
 import { TodoModel } from '../../models/todo.model';
+import { DAY } from '../../constant';
 
 @Component({
   selector: 'app-todo-item',
@@ -11,6 +12,8 @@ import { TodoModel } from '../../models/todo.model';
 export class TodoItem {
   item = input.required<TodoModel>();
   completed = input(false);
+
+  edit = output<void>();
 
   private readonly store = inject(TodoService);
 
@@ -31,6 +34,22 @@ export class TodoItem {
 
     const diff = this.item().completeBy.getTime() - Date.now();
 
-    return diff <= 24 * 60 * 60 * 1000;
+    return diff <= DAY;
+  }
+
+  startEdit() {
+    this.edit.emit();
+  }
+
+  deleteItem() {
+    this.store.delete(this.item().id);
+  }
+
+  undoCompleted() {
+    this.store.undoCompleted(this.item().id);
+  }
+
+  markCompleted() {
+    this.store.markCompleted(this.item().id);
   }
 }
