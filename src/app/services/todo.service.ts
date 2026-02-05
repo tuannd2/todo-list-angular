@@ -1,6 +1,6 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, effect, Injectable, signal } from '@angular/core';
 import { TodoModel, UpdateTodoModel } from '../models/todo.model';
-import { TODO_MOCK_DATA } from '../mocks/todo.mock';
+import { ToastService } from './toast.service';
 
 @Injectable({
   providedIn: 'root',
@@ -8,8 +8,33 @@ import { TODO_MOCK_DATA } from '../mocks/todo.mock';
 export class TodoService {
   private readonly _items = signal<TodoModel[]>([]);
 
-  constructor() {
-    this._items.set(TODO_MOCK_DATA);
+  constructor(private readonly toastService: ToastService) {
+    this.loadFromSession();
+
+    effect(() => {
+      this.saveToSession();
+    });
+  }
+
+  private loadFromSession() {
+    try {
+      const data = sessionStorage.getItem('todoItems');
+      if (data) {
+        const items: TodoModel[] = JSON.parse(data);
+        this._items.set(items);
+      }
+    } catch (error) {
+      console.error('Failed to load todo items from session storage:', error)
+    }
+  }
+
+  private saveToSession() {
+    try {
+      const data = JSON.stringify(this._items());
+      sessionStorage.setItem('todoItems', data);
+    } catch (error) {
+      console.error('Failed to save todo items to session storage:', error)
+    }
   }
 
   readonly items = this._items.asReadonly();
@@ -33,10 +58,15 @@ export class TodoService {
       ...items,
       newItem,
     ]);
+
+    this.toastService.show('Item created successfully.', 'success');
+
   }
 
   update(id: string, changes: UpdateTodoModel) {
     this._items.update((items) => items.map((i) => (i.id === id ? { ...i, ...changes } : i)));
+
+    this.toastService.show('Item updated successfully.', 'success');
   }
 
   markCompleted(id: string) {
@@ -57,6 +87,9 @@ export class TodoService {
     if (confirm('Are you sure you want to delete this item?')) {
       this._items.update((items) => items.filter((i) => i.id !== id));
     }
+
+    this.toastService.show('Todo item deleted successfully.', 'success');
+
   }
 
   private sortFn(a: TodoModel, b: TodoModel): number {
