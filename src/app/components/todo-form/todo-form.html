@@ -1,5 +1,9 @@
 <form autofocus="true" [formGroup]="form" (ngSubmit)="submit()" class="todo-form">
-    <input autofocus="true" type="text" placeholder="Summary" formControlName="summary" />
+    <input autofocus="true" type="text" placeholder="Summary" formControlName="summary"
+        [class.invalid]="hasError('summary')" />
+    @if (hasError("summary")) {
+    <p class="error-msg">{{ getErrorMessage("summary") }}</p>
+    }
 
     <input type="text" placeholder="Description" formControlName="description" />
 
@@ -9,7 +13,10 @@
         <option [value]="PRIORITY.LOW">Low</option>
     </select>
 
-    <input type="date" formControlName="completeBy" />
+    <input type="date" formControlName="completeBy" [class.invalid]="hasError('completeBy')" />
+    @if (hasError("completeBy")) {
+    <p class="error-msg">{{ getErrorMessage("completeBy") }}</p>
+    }
 
     <button type="submit" [disabled]="form.invalid">
         Save
