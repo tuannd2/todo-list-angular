@@ -64,6 +64,6 @@ export class TodoService {
       return a.priority - b.priority;
     }
 
-    return a.completeBy.getTime() - b.completeBy.getTime();
+    return a.completeBy.localeCompare(b.completeBy);
   }
 }

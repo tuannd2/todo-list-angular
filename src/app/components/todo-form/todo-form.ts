@@ -2,7 +2,7 @@ import { Component, effect, inject, input, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TodoService } from '../../services/todo.service';
 import { TodoModel } from '../../models/todo.model';
-import { DAY, type Priority, PRIORITY } from '../../constant';
+import { type Priority, PRIORITY } from '../../constant';
 import { notPastDate } from '../../validators/not-past-date.validator';
 
 @Component({
@@ -26,7 +26,7 @@ export class TodoForm {
     summary: ['', [Validators.required, Validators.maxLength(30)]],
     description: [''],
     priority: [PRIORITY.MEDIUM as Priority],
-    completeBy: [undefined as string | undefined, [notPastDate]],
+    completeBy: ['', [notPastDate]],
   }, {
     updateOn: "change"
   });
@@ -34,8 +34,7 @@ export class TodoForm {
   constructor() {
     effect(() => {
       if (this.todo()) {
-        console.log(this.todo());
-        this.form.patchValue({ ...this.todo()!, completeBy: this.todo()!.completeBy.toISOString().split('T')[0] });
+        this.form.patchValue(this.todo()!);
       } else {
         this.form.reset({
           summary: '',
@@ -70,7 +69,7 @@ export class TodoForm {
 
     const value = {
       ...this.form.getRawValue(),
-      completeBy: this.form.value.completeBy ? new Date(this.form.value.completeBy + 'T00:00:00') : new Date(Date.now() + 3 * DAY),
+      completeBy: this.form.value.completeBy || '',
     }
 
     if (this.todo()) {

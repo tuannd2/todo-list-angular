@@ -6,7 +6,7 @@ export interface TodoModel {
   description?: string;
   priority: Priority;
   isCompleted: boolean;
-  completeBy: Date;
+  completeBy: string;
 }
 
 export type CreateTodoModel = Omit<TodoModel, 'id' | 'isCompleted'>;
