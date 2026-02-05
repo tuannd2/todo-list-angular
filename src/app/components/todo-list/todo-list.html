@@ -1,4 +1,11 @@
 <section class="todo-list">
+    <h1>ToDo List App</h1>
+    <div class="description">
+        <div [attr.data-priority]="1">High</div>
+        <div [attr.data-priority]="2">Medium</div>
+        <div [attr.data-priority]="3">Low</div>
+    </div>
+
     <div style="margin-bottom: 30px;">
         @if (isCreating() && !editingId()) {
         <app-todo-form (done)="cancelCreate()" />}

@@ -9,6 +9,39 @@
     flex-direction: column;
     gap: 12px;
 
+    .description {
+        display: flex;
+        justify-content: flex-end;
+        gap: 16px;
+        margin-bottom: 8px;
+
+        div {
+            font-size: 14px;
+            padding-left: 20px;
+            position: relative;
+
+            &::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 50%;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                transform: translateY(-50%);
+                background: $priority-3;
+            }
+
+            &[data-priority='1']::before {
+                background: $priority-1;
+            }
+
+            &[data-priority='2']::before {
+                background: $priority-2;
+            }
+        }
+    }
+
     .add-new-btn {
         display: flex;
         align-items: center;

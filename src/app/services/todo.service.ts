@@ -86,10 +86,9 @@ export class TodoService {
   delete(id: string) {
     if (confirm('Are you sure you want to delete this item?')) {
       this._items.update((items) => items.filter((i) => i.id !== id));
+
+      this.toastService.show('Item deleted successfully.', 'success');
     }
-
-    this.toastService.show('Todo item deleted successfully.', 'success');
-
   }
 
   private sortFn(a: TodoModel, b: TodoModel): number {

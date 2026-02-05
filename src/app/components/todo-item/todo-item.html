@@ -11,18 +11,15 @@
     </div>
 
     <div class="actions">
-        <button class="actions-btn" (click)="startEdit()">✎</button>
-
         @if (!item().isCompleted) {
-        <button class="actions-btn" (click)="markCompleted()">✔</button>
-        }
+        <button title="edit" class="actions-btn" (click)="startEdit()">✎</button>
+        <button title="complete" class="actions-btn" (click)="markCompleted()">✔</button>
+        <button title="delete" class="actions-btn" (click)="deleteItem()">✖</button>
 
-        @if (!item().isCompleted) {
-        <button class="actions-btn" (click)="deleteItem()">✖</button>
         }
     </div>
 
     @if (item().isCompleted) {
-    <button class="actions-btn undo-btn" (click)="undoCompleted()">↩</button>
+    <button title="undo" class="actions-btn undo-btn" (click)="undoCompleted()">↩</button>
     }
 </div>

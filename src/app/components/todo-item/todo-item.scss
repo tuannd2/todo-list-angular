@@ -7,6 +7,7 @@
     border-radius: 14px;
     padding: 14px 28px 16px;
     position: relative;
+    overflow: hidden;
 
     display: flex;
     align-items: center;
@@ -53,6 +54,17 @@
         flex: 0 0 101px;
         display: flex;
         justify-content: space-between;
+        position: relative;
+
+        &:hover {
+            cursor: help;
+
+            .todo-item[data-has-desc='true'] {
+                cursor: default !important;
+            }
+        }
+
+
     }
 }
 
@@ -68,10 +80,26 @@
 
 .undo-btn {
     position: absolute;
-    right: -7%;
+    right: 0;
+    bottom: 0;
 
     &:hover {
         background-color: color.adjust(#ebf0f6, $lightness: -10%);
+    }
+}
+
+@media (max-width: 480px) {
+    .todo-item {
+        flex-direction: column;
+
+        .due-date {
+            flex: none;
+        }
+
+        .actions {
+            flex: none;
+            gap: 12px;
+        }
     }
 }
 
