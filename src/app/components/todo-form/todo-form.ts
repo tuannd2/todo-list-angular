@@ -11,25 +11,28 @@ import { notPastDate } from '../../validators/not-past-date.validator';
   templateUrl: './todo-form.html',
   styleUrl: './todo-form.scss',
 })
-
-
 export class TodoForm {
   private readonly fb = inject(FormBuilder);
   private readonly store = inject(TodoService);
+
+  readonly isSubmitting = this.store.isLoading();
 
   PRIORITY = PRIORITY;
 
   todo = input<TodoModel | null>(null);
   done = output<void>();
 
-  readonly form = this.fb.nonNullable.group({
-    summary: ['', [Validators.required, Validators.maxLength(30)]],
-    description: [''],
-    priority: [PRIORITY.MEDIUM as Priority],
-    completeBy: ['', [notPastDate]],
-  }, {
-    updateOn: "change"
-  });
+  readonly form = this.fb.nonNullable.group(
+    {
+      summary: ['', [Validators.required, Validators.maxLength(30)]],
+      description: [''],
+      priority: [PRIORITY.MEDIUM as Priority],
+      completeBy: ['', [notPastDate]],
+    },
+    {
+      updateOn: 'change',
+    },
+  );
 
   constructor() {
     effect(() => {
@@ -43,7 +46,7 @@ export class TodoForm {
           completeBy: '',
         });
       }
-    })
+    });
   }
 
   hasError(controlName: keyof typeof this.form.controls): boolean {
@@ -55,27 +58,29 @@ export class TodoForm {
   getErrorMessage(controlName: keyof typeof this.form.controls): string {
     const control = this.form.controls[controlName];
 
-    if (!control.errors) return ''
+    if (!control.errors) return '';
 
-    if (control.errors?.['required']) return "This field is required.";
-    if (control.errors?.['maxlength']) return `Maximum length is ${control.errors['maxlength'].requiredLength} characters.`;
-    if (control.errors?.['pastDate']) return "The date cannot be in the past.";
+    if (control.errors?.['required']) return 'This field is required.';
+    if (control.errors?.['maxlength'])
+      return `Maximum length is ${control.errors['maxlength'].requiredLength} characters.`;
+    if (control.errors?.['pastDate']) return 'The date cannot be in the past.';
 
-    return "Invalid field.";
+    return 'Invalid field.';
   }
 
-  submit() {
+  async submit() {
     if (this.form.invalid) return;
 
     const value = {
       ...this.form.getRawValue(),
-      completeBy: this.form.value.completeBy || new Date(Date.now() + 3 * DAY).toISOString().split('T')[0],
-    }
+      completeBy:
+        this.form.value.completeBy || new Date(Date.now() + 3 * DAY).toISOString().slice(0, 16),
+    };
 
     if (this.todo()) {
-      this.store.update(this.todo()!.id, value);
+      await this.store.update(this.todo()!.id, value);
     } else {
-      this.store.create(value);
+      await this.store.create(value);
     }
 
     this.done.emit();

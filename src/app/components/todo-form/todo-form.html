@@ -1,4 +1,4 @@
-<form autofocus="true" [formGroup]="form" (ngSubmit)="submit()" class="todo-form">
+<form autofocus="true" [formGroup]="form" (ngSubmit)="submit()" class="todo-form" [class.loading]="isSubmitting">
     <input autofocus="true" type="text" placeholder="Summary" formControlName="summary"
         [class.invalid]="hasError('summary')" />
     @if (hasError("summary")) {
@@ -13,7 +13,7 @@
         <option [value]="PRIORITY.LOW">Low</option>
     </select>
 
-    <input type="date" formControlName="completeBy" [class.invalid]="hasError('completeBy')" />
+    <input type="datetime-local" formControlName="completeBy" [class.invalid]="hasError('completeBy')" />
     @if (hasError("completeBy")) {
     <p class="error-msg">{{ getErrorMessage("completeBy") }}</p>
     }

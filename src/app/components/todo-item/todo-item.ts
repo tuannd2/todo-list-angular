@@ -28,6 +28,21 @@ export class TodoItem {
     return 'normal';
   }
 
+  get formattedCompletedBy() {
+    const date = new Date(this.item().completeBy);
+
+    if (isNaN(date.getTime())) return '';
+
+    return date.toLocaleString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+  }
+
   startEdit() {
     this.edit.emit();
   }

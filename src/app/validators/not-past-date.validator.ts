@@ -1,12 +1,14 @@
-import { AbstractControl, ValidationErrors } from "@angular/forms";
+import { AbstractControl, ValidationErrors } from '@angular/forms';
 
 export function notPastDate(control: AbstractControl): ValidationErrors | null {
-    if (!control.value) return null;
+  const value = control.value;
 
-    const selected = new Date(control.value + "T00:00:00");
+  if (!value) return null;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+  const normalized = value.includes('T') ? value : `${value}T00:00`;
 
-    return selected < today ? { pastDate: true } : null;
+  const inputDate = new Date(normalized);
+  if (isNaN(inputDate.getTime())) return { pastDate: true };
+
+  return inputDate >= new Date() ? null : { pastDate: true };
 }
