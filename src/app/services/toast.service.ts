@@ -3,22 +3,22 @@ import { Toast, ToastType } from '../models/toast.model';
 
 @Injectable({ providedIn: 'root' })
 export class ToastService {
-    private _toasts = signal<Toast[]>([]);
-    readonly toasts = this._toasts.asReadonly();
+  readonly #toasts$ = signal<Toast[]>([]);
+  #id = 0;
 
-    private id = 0;
+  public readonly toasts$ = this.#toasts$.asReadonly();
 
-    show(message: string, type: ToastType = 'info', duration = 2500) {
-        const toast: Toast = {
-            id: ++this.id,
-            message,
-            type,
-        };
+  public show(message: string, type: ToastType = 'info', duration = 2500): void {
+    const toast: Toast = {
+      id: ++this.#id,
+      message,
+      type,
+    };
 
-        this._toasts.update((t) => [...t, toast]);
+    this.#toasts$.update((t) => [...t, toast]);
 
-        setTimeout(() => {
-            this._toasts.update((t) => t.filter((i) => i.id !== toast.id));
-        }, duration);
-    }
+    setTimeout(() => {
+      this.#toasts$.update((t) => t.filter((i) => i.id !== toast.id));
+    }, duration);
+  }
 }

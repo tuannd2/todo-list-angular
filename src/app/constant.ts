@@ -4,7 +4,7 @@ export const PRIORITY = {
   LOW: 3,
   MEDIUM: 2,
   HIGH: 1,
-} as const;
+} as const satisfies Record<string, number>;
 
 export type Priority = (typeof PRIORITY)[keyof typeof PRIORITY];
 

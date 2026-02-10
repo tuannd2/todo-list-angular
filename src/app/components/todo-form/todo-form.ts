@@ -3,7 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TodoService } from '../../services/todo.service';
 import { TodoModel } from '../../models/todo.model';
 import { DAY, type Priority, PRIORITY } from '../../constant';
-import { notPastDate } from '../../validators/not-past-date.validator';
+import { validateNotPastDate } from '../../validators/not-past-date.validator';
 
 @Component({
   selector: 'app-todo-form',
@@ -12,29 +12,29 @@ import { notPastDate } from '../../validators/not-past-date.validator';
   styleUrl: './todo-form.scss',
 })
 export class TodoForm {
-  private readonly fb = inject(FormBuilder);
-  private readonly store = inject(TodoService);
+  readonly #fb = inject(FormBuilder);
+  readonly #store = inject(TodoService);
 
-  readonly isSubmitting = this.store.isLoading();
-
-  PRIORITY = PRIORITY;
-
-  todo = input<TodoModel | null>(null);
-  done = output<void>();
-
-  readonly form = this.fb.nonNullable.group(
+  public readonly isSubmitting = this.#store.isLoading$();
+  public readonly form = this.#fb.nonNullable.group(
     {
       summary: ['', [Validators.required, Validators.maxLength(30)]],
       description: [''],
       priority: [PRIORITY.MEDIUM as Priority],
-      completeBy: ['', [notPastDate]],
+      completeBy: ['', [validateNotPastDate]],
     },
     {
       updateOn: 'change',
     },
   );
 
-  constructor() {
+  public PRIORITY = PRIORITY;
+
+  public todo = input<TodoModel | null>(null);
+
+  public done = output<void>();
+
+  public constructor() {
     effect(() => {
       if (this.todo()) {
         this.form.patchValue(this.todo()!);
@@ -49,13 +49,13 @@ export class TodoForm {
     });
   }
 
-  hasError(controlName: keyof typeof this.form.controls): boolean {
+  public hasError(controlName: keyof typeof this.form.controls): boolean {
     const control = this.form.controls[controlName];
 
     return control.invalid && (control.dirty || control.touched);
   }
 
-  getErrorMessage(controlName: keyof typeof this.form.controls): string {
+  public getErrorMessage(controlName: keyof typeof this.form.controls): string {
     const control = this.form.controls[controlName];
 
     if (!control.errors) return '';
@@ -68,7 +68,7 @@ export class TodoForm {
     return 'Invalid field.';
   }
 
-  async submit() {
+  public async submit(): Promise<void> {
     if (this.form.invalid) return;
 
     const value = {
@@ -78,9 +78,9 @@ export class TodoForm {
     };
 
     if (this.todo()) {
-      await this.store.update(this.todo()!.id, value);
+      await this.#store.update(this.todo()!.id, value);
     } else {
-      await this.store.create(value);
+      await this.#store.create(value);
     }
 
     this.done.emit();
