@@ -9,5 +9,5 @@ import { NgClass } from '@angular/common';
   styleUrl: './toast.scss',
 })
 export class Toast {
-  toastService = inject(ToastService);
+  public readonly toastService = inject(ToastService);
 }

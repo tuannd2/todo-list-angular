@@ -1,13 +1,13 @@
-import { Priority } from "../constant";
+import { Priority } from '../constant';
 
-export interface TodoModel {
+export type TodoModel = {
   id: string;
   summary: string;
   description?: string;
   priority: Priority;
   isCompleted: boolean;
   completeBy: string;
-}
+};
 
 export type CreateTodoModel = Omit<TodoModel, 'id' | 'isCompleted'>;
 

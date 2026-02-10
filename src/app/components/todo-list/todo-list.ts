@@ -10,28 +10,27 @@ import { TodoForm } from '../todo-form/todo-form';
   styleUrl: './todo-list.scss',
 })
 export class TodoList {
-  private readonly store = inject(TodoService);
+  readonly #store = inject(TodoService);
 
-  readonly unfinishedItems = this.store.unfinishedItems;
-  readonly finishedItems = this.store.finishedItems;
+  public readonly unfinishedItems$ = this.#store.unfinishedItems$;
+  public readonly finishedItems$ = this.#store.finishedItems$;
+  public readonly editingId$ = signal<string | null>(null);
+  public readonly isCreating$ = signal(false);
 
-  readonly editingId = signal<string | null>(null);
-  readonly isCreating = signal(false);
-
-  startCreate() {
-    this.isCreating.set(true);
+  public startCreate(): void {
+    this.isCreating$.set(true);
   }
 
-  cancelCreate() {
-    this.isCreating.set(false);
+  public cancelCreate(): void {
+    this.isCreating$.set(false);
   }
 
-  startEdit(id: string) {
+  public startEdit(id: string): void {
     console.log('Editing', id);
-    this.editingId.set(id);
+    this.editingId$.set(id);
   }
 
-  cancelEdit() {
-    this.editingId.set(null);
+  public cancelEdit(): void {
+    this.editingId$.set(null);
   }
 }
