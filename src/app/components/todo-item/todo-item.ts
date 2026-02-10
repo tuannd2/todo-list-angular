@@ -10,14 +10,14 @@ import { DAY } from '../../constant';
   styleUrl: './todo-item.scss',
 })
 export class TodoItem {
-  item = input.required<TodoModel>();
-  completed = input(false);
+  readonly #store = inject(TodoService);
 
-  edit = output<void>();
+  public readonly item = input.required<TodoModel>();
+  public readonly completed = input(false);
 
-  private readonly store = inject(TodoService);
+  public readonly edit = output<void>();
 
-  get deadlineState(): 'normal' | 'highlight' | 'overdue' {
+  public get deadlineState(): 'normal' | 'highlight' | 'overdue' {
     if (this.item().isCompleted || !this.item().completeBy) return 'normal';
 
     const diff = new Date(this.item().completeBy).getTime() - Date.now();
@@ -28,7 +28,7 @@ export class TodoItem {
     return 'normal';
   }
 
-  get formattedCompletedBy() {
+  public get formattedCompletedBy(): string {
     const date = new Date(this.item().completeBy);
 
     if (isNaN(date.getTime())) return '';
@@ -43,19 +43,19 @@ export class TodoItem {
     });
   }
 
-  startEdit() {
+  public startEdit(): void {
     this.edit.emit();
   }
 
-  deleteItem() {
-    this.store.delete(this.item().id);
+  public deleteItem(): void {
+    this.#store.delete(this.item().id);
   }
 
-  undoCompleted() {
-    this.store.undoCompleted(this.item().id);
+  public undoCompleted(): void {
+    this.#store.undoCompleted(this.item().id);
   }
 
-  markCompleted() {
-    this.store.markCompleted(this.item().id);
+  public markCompleted(): void {
+    this.#store.markCompleted(this.item().id);
   }
 }

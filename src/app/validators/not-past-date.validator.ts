@@ -1,6 +1,6 @@
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 
-export function notPastDate(control: AbstractControl): ValidationErrors | null {
+export function validateNotPastDate(control: AbstractControl): ValidationErrors | null {
   const value = control.value;
 
   if (!value) return null;

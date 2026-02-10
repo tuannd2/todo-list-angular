@@ -8,6 +8,7 @@ import { TodoService } from '../../services/todo.service';
   styleUrl: './loading.scss',
 })
 export class Loading {
-  private readonly store = inject(TodoService);
-  readonly isLoading = this.store.isLoading;
+  readonly #store = inject(TodoService);
+
+  public readonly isLoading$ = this.#store.isLoading$;
 }

@@ -1,5 +1,5 @@
 <div class="toast-wrapper">
-    @for (t of toastService.toasts(); track t.id) {
+    @for (t of toastService.toasts$(); track t.id) {
     <div class="toast" [ngClass]="t.type">
         {{ t.message }}
     </div>

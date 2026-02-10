@@ -10,5 +10,5 @@ import { Loading } from './components/loading/loading';
   styleUrl: './app.scss',
 })
 export class App {
-  protected readonly title = signal('todo-list');
+  public readonly title$ = signal('todo-list');
 }
