@@ -10,5 +10,5 @@ import { TodoService } from '../../services/todo.service';
 export class Loading {
   readonly #store = inject(TodoService);
 
-  public readonly isLoading$ = this.#store.isLoading$;
+  protected readonly isLoading$ = this.#store.isLoading$;
 }

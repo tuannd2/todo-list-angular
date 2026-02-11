@@ -1,7 +1,7 @@
 import { Component, inject, input, output } from '@angular/core';
 import { TodoService } from '../../services/todo.service';
 import { TodoModel } from '../../models/todo.model';
-import { DAY } from '../../constant';
+import { day } from '../../constant';
 
 @Component({
   selector: 'app-todo-item',
@@ -12,23 +12,23 @@ import { DAY } from '../../constant';
 export class TodoItem {
   readonly #store = inject(TodoService);
 
-  public readonly item = input.required<TodoModel>();
-  public readonly completed = input(false);
+  protected readonly item = input.required<TodoModel>();
+  protected readonly completed = input(false);
 
-  public readonly edit = output<void>();
+  protected readonly edit = output<void>();
 
-  public get deadlineState(): 'normal' | 'highlight' | 'overdue' {
+  protected get deadlineState(): 'normal' | 'highlight' | 'overdue' {
     if (this.item().isCompleted || !this.item().completeBy) return 'normal';
 
     const diff = new Date(this.item().completeBy).getTime() - Date.now();
 
     if (diff < 0) return 'overdue';
-    if (diff <= DAY) return 'highlight';
+    if (diff <= day) return 'highlight';
 
     return 'normal';
   }
 
-  public get formattedCompletedBy(): string {
+  protected get formattedCompletedBy(): string {
     const date = new Date(this.item().completeBy);
 
     if (isNaN(date.getTime())) return '';
@@ -43,19 +43,19 @@ export class TodoItem {
     });
   }
 
-  public startEdit(): void {
+  protected startEdit(): void {
     this.edit.emit();
   }
 
-  public deleteItem(): void {
+  protected deleteItem(): void {
     this.#store.delete(this.item().id);
   }
 
-  public undoCompleted(): void {
+  protected undoCompleted(): void {
     this.#store.undoCompleted(this.item().id);
   }
 
-  public markCompleted(): void {
+  protected markCompleted(): void {
     this.#store.markCompleted(this.item().id);
   }
 }

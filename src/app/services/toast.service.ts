@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Toast, ToastType } from '../models/toast.model';
+import { Toast } from '../models/toast.model';
 
 @Injectable({ providedIn: 'root' })
 export class ToastService {
@@ -8,11 +8,11 @@ export class ToastService {
 
   public readonly toasts$ = this.#toasts$.asReadonly();
 
-  public show(message: string, type: ToastType = 'info', duration = 2500): void {
+  public show(message: string, type = 'info', duration = 2500): void {
     const toast: Toast = {
       id: ++this.#id,
       message,
-      type,
+      type: type as Toast['type'],
     };
 
     this.#toasts$.update((t) => [...t, toast]);

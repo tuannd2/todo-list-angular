@@ -1,7 +1,8 @@
 import { computed, effect, Injectable, signal } from '@angular/core';
-import { TodoModel, UpdateTodoModel } from '../models/todo.model';
 import { ToastService } from './toast.service';
-import { DELAY_MS } from '../constant';
+import { delay_ms } from '../constant';
+import { TodoModel } from '../models/todo.model';
+import { UpdateTodoModel } from '../models/update-todo.model';
 
 @Injectable({
   providedIn: 'root',
@@ -20,10 +21,9 @@ export class TodoService {
   public readonly finishedItems$ = computed(() => this.items$().filter((i) => i.isCompleted));
 
   public constructor(private readonly toastService: ToastService) {
-    // this.#loadFromSession();
-    // effect(() => {
-    //   this.#saveToSession();
-    // });
+    this.#loadFromSession();
+
+    this.#saveToSession();
   }
 
   public async create(item: Omit<TodoModel, 'id' | 'isCompleted'>): Promise<void> {
@@ -62,7 +62,7 @@ export class TodoService {
   }
 
   #delay(): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, DELAY_MS));
+    return new Promise((resolve) => setTimeout(resolve, delay_ms));
   }
 
   #operation(fn: () => void): Promise<void> {
@@ -94,12 +94,15 @@ export class TodoService {
   }
 
   #saveToSession(): void {
-    try {
-      const data = JSON.stringify(this.#items$());
-      sessionStorage.setItem('todoItems', data);
-    } catch (error) {
-      console.error('Failed to save todo items to session storage:', error);
-    }
+    effect(() => {
+      try {
+        const data = JSON.stringify(this.unfinishedItems$());
+        sessionStorage.setItem('todoItems', data);
+      } catch (error) {
+        console.error('Failed to save todo items to session storage:', error);
+      }
+    })
+
   }
 
   #sortFn(a: TodoModel, b: TodoModel): number {
