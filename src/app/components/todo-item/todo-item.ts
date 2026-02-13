@@ -1,11 +1,13 @@
 import { Component, inject, input, output } from '@angular/core';
 import { TodoService } from '../../services/todo.service';
 import { TodoModel } from '../../models/todo.model';
-import { day } from '../../constant';
+import { DatePipe } from '@angular/common';
+import { toMinute } from '../../utils/datetime.utils';
+import { minute_per_day } from '../../constant';
 
 @Component({
   selector: 'app-todo-item',
-  imports: [],
+  imports: [DatePipe],
   templateUrl: './todo-item.html',
   styleUrl: './todo-item.scss',
 })
@@ -18,29 +20,19 @@ export class TodoItem {
   protected readonly edit = output<void>();
 
   protected get deadlineState(): 'normal' | 'highlight' | 'overdue' {
-    if (this.item().isCompleted || !this.item().completeBy) return 'normal';
+    const item = this.item();
 
-    const diff = new Date(this.item().completeBy).getTime() - Date.now();
+    if (item.isCompleted || !item.completeBy) return 'normal';
 
-    if (diff < 0) return 'overdue';
-    if (diff <= day) return 'highlight';
+    const nowMinute = toMinute(new Date());
+    const deadlineMinute = toMinute(new Date(item.completeBy));
+
+    const diffMinutes = deadlineMinute - nowMinute;
+
+    if (diffMinutes < 0) return 'overdue';
+    if (diffMinutes <= minute_per_day) return 'highlight'; // <= 1 day
 
     return 'normal';
-  }
-
-  protected get formattedCompletedBy(): string {
-    const date = new Date(this.item().completeBy);
-
-    if (isNaN(date.getTime())) return '';
-
-    return date.toLocaleString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
   }
 
   protected startEdit(): void {

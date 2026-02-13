@@ -2,9 +2,9 @@ import { Component, effect, inject, input, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TodoService } from '../../services/todo.service';
 import { validateNotPastDate } from '../../validators/not-past-date.validator';
-import { day } from '../../constant';
 import { TodoModel } from '../../models/todo.model';
 import { priority, Priority } from '../../models/priority.model';
+import { minute_per_day, ms_per_minute } from '../../constant';
 
 @Component({
   selector: 'app-todo-form',
@@ -69,7 +69,8 @@ export class TodoFormComponent {
     const value = {
       ...this.form.getRawValue(),
       completeBy:
-        this.form.value.completeBy || new Date(Date.now() + 3 * day).toISOString().slice(0, 16),
+        this.form.value.completeBy ||
+        new Date(Date.now() + 3 * minute_per_day * ms_per_minute).toISOString(),
     };
 
     if (this.todo()) {
