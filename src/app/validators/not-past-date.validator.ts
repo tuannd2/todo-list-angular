@@ -1,14 +1,12 @@
 import { AbstractControl, ValidationErrors } from '@angular/forms';
+import { toMinute } from '../utils/datetime.utils';
 
 export function validateNotPastDate(control: AbstractControl): ValidationErrors | null {
   const value = control.value;
 
   if (!value) return null;
 
-  const normalized = value.includes('T') ? value : `${value}T00:00`;
+  const inputTime = new Date(value);
 
-  const inputDate = new Date(normalized);
-  if (isNaN(inputDate.getTime())) return { pastDate: true };
-
-  return inputDate >= new Date() ? null : { pastDate: true };
+  return toMinute(inputTime) < toMinute(new Date()) ? { pastDate: true } : null;
 }

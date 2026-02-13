@@ -1,7 +1,5 @@
-export type ToastType = 'success' | 'error' | 'info';
-
 export type Toast = {
-  id: number;
-  message: string;
-  type: ToastType;
+    id: number;
+    message: string;
+    type: 'success' | 'error' | 'info';
 };

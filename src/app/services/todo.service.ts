@@ -1,7 +1,9 @@
 import { computed, effect, Injectable, signal } from '@angular/core';
-import { TodoModel, UpdateTodoModel } from '../models/todo.model';
 import { ToastService } from './toast.service';
-import { DELAY_MS } from '../constant';
+import { delay_ms } from '../constant';
+import { TodoModel } from '../models/todo.model';
+import { UpdateTodoModel } from '../models/update-todo.model';
+import { TodoStorageService } from './todo-storage.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,18 +14,14 @@ export class TodoService {
 
   public readonly isLoading$ = this.#isLoading$.asReadonly();
   public readonly items$ = this.#items$.asReadonly();
-  public readonly unfinishedItems$ = computed(() =>
-    this.items$()
-      .filter((i) => !i.isCompleted)
-      .sort(this.#sortFn),
-  );
-  public readonly finishedItems$ = computed(() => this.items$().filter((i) => i.isCompleted));
 
-  public constructor(private readonly toastService: ToastService) {
-    // this.#loadFromSession();
-    // effect(() => {
-    //   this.#saveToSession();
-    // });
+  public constructor(
+    private readonly toastService: ToastService,
+    private readonly todoStorageService: TodoStorageService,
+  ) {
+    this.#items$.set(this.todoStorageService.load());
+
+    this.todoStorageService.save(this.#items$().filter((i) => !i.isCompleted));
   }
 
   public async create(item: Omit<TodoModel, 'id' | 'isCompleted'>): Promise<void> {
@@ -62,7 +60,7 @@ export class TodoService {
   }
 
   #delay(): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, DELAY_MS));
+    return new Promise((resolve) => setTimeout(resolve, delay_ms));
   }
 
   #operation(fn: () => void): Promise<void> {
@@ -79,34 +77,5 @@ export class TodoService {
         this.#isLoading$.set(false);
       }
     })();
-  }
-
-  #loadFromSession(): void {
-    try {
-      const data = sessionStorage.getItem('todoItems');
-      if (data) {
-        const items: TodoModel[] = JSON.parse(data);
-        this.#items$.set(items);
-      }
-    } catch (error) {
-      console.error('Failed to load todo items from session storage:', error);
-    }
-  }
-
-  #saveToSession(): void {
-    try {
-      const data = JSON.stringify(this.#items$());
-      sessionStorage.setItem('todoItems', data);
-    } catch (error) {
-      console.error('Failed to save todo items to session storage:', error);
-    }
-  }
-
-  #sortFn(a: TodoModel, b: TodoModel): number {
-    if (a.priority !== b.priority) {
-      return a.priority - b.priority;
-    }
-
-    return a.completeBy.localeCompare(b.completeBy);
   }
 }

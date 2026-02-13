@@ -7,7 +7,7 @@
     </div>
 
     <div class="due-date">
-        Due Date: {{ formattedCompletedBy }}
+        Due Date: {{ item().completeBy | date:'MMM d, y, h:mm' }}
     </div>
 
     <div class="actions">

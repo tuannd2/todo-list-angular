@@ -8,7 +8,7 @@
 
     <div style="margin-bottom: 30px;">
         @if (isCreating$() && !editingId$()) {
-        <app-todo-form (done)="cancelCreate()" />}
+        <app-todo-form (formSubmitted)="cancelCreate()" />}
 
         @else {<button class="add-new-btn" (click)="startCreate()">
             <span class="icon">✚</span>
@@ -18,7 +18,7 @@
 
     @for (item of unfinishedItems$(); track item.id) {
     @if (editingId$() === item.id) {
-    <app-todo-form [todo]="item" (done)="cancelEdit()" />
+    <app-todo-form [todo]="item" (formSubmitted)="cancelEdit()" />
     }
 
     @else {

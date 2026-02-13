@@ -1,11 +1,13 @@
 import { Component, inject, input, output } from '@angular/core';
 import { TodoService } from '../../services/todo.service';
 import { TodoModel } from '../../models/todo.model';
-import { DAY } from '../../constant';
+import { DatePipe } from '@angular/common';
+import { toMinute } from '../../utils/datetime.utils';
+import { minute_per_day } from '../../constant';
 
 @Component({
   selector: 'app-todo-item',
-  imports: [],
+  imports: [DatePipe],
   templateUrl: './todo-item.html',
   styleUrl: './todo-item.scss',
 })
@@ -15,47 +17,37 @@ export class TodoItem {
   public readonly item = input.required<TodoModel>();
   public readonly completed = input(false);
 
-  public readonly edit = output<void>();
+  protected readonly edit = output<void>();
 
-  public get deadlineState(): 'normal' | 'highlight' | 'overdue' {
-    if (this.item().isCompleted || !this.item().completeBy) return 'normal';
+  protected get deadlineState(): 'normal' | 'highlight' | 'overdue' {
+    const item = this.item();
 
-    const diff = new Date(this.item().completeBy).getTime() - Date.now();
+    if (item.isCompleted || !item.completeBy) return 'normal';
 
-    if (diff < 0) return 'overdue';
-    if (diff <= DAY) return 'highlight';
+    const nowMinute = toMinute(new Date());
+    const deadlineMinute = toMinute(new Date(item.completeBy));
+
+    const diffMinutes = deadlineMinute - nowMinute;
+
+    if (diffMinutes < 0) return 'overdue';
+    if (diffMinutes <= minute_per_day) return 'highlight'; // <= 1 day
 
     return 'normal';
   }
 
-  public get formattedCompletedBy(): string {
-    const date = new Date(this.item().completeBy);
-
-    if (isNaN(date.getTime())) return '';
-
-    return date.toLocaleString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
-  }
-
-  public startEdit(): void {
+  protected startEdit(): void {
     this.edit.emit();
   }
 
-  public deleteItem(): void {
+  protected deleteItem(): void {
     this.#store.delete(this.item().id);
   }
 
-  public undoCompleted(): void {
+  protected undoCompleted(): void {
     this.#store.undoCompleted(this.item().id);
   }
 
-  public markCompleted(): void {
+  protected markCompleted(): void {
     this.#store.markCompleted(this.item().id);
   }
 }

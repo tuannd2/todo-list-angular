@@ -1,9 +1,10 @@
 import { Component, effect, inject, input, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TodoService } from '../../services/todo.service';
-import { TodoModel } from '../../models/todo.model';
-import { DAY, type Priority, PRIORITY } from '../../constant';
 import { validateNotPastDate } from '../../validators/not-past-date.validator';
+import { TodoModel } from '../../models/todo.model';
+import { priority, Priority } from '../../models/priority.model';
+import { minute_per_day, ms_per_minute } from '../../constant';
 
 @Component({
   selector: 'app-todo-form',
@@ -11,70 +12,65 @@ import { validateNotPastDate } from '../../validators/not-past-date.validator';
   templateUrl: './todo-form.html',
   styleUrl: './todo-form.scss',
 })
-export class TodoForm {
+export class TodoFormComponent {
   readonly #fb = inject(FormBuilder);
   readonly #store = inject(TodoService);
 
-  public readonly isSubmitting = this.#store.isLoading$();
-  public readonly form = this.#fb.nonNullable.group(
-    {
-      summary: ['', [Validators.required, Validators.maxLength(30)]],
-      description: [''],
-      priority: [PRIORITY.MEDIUM as Priority],
-      completeBy: ['', [validateNotPastDate]],
-    },
-    {
-      updateOn: 'change',
-    },
-  );
+  protected readonly isSubmitting = this.#store.isLoading$();
+  protected readonly form = this.#fb.nonNullable.group({
+    summary: ['', [Validators.required, Validators.maxLength(30)]],
+    description: [''],
+    priority: [priority.MEDIUM as Priority],
+    completeBy: ['', [validateNotPastDate]],
+  });
 
-  public PRIORITY = PRIORITY;
+  protected PRIORITY = priority;
 
   public todo = input<TodoModel | null>(null);
 
-  public done = output<void>();
+  public formSubmitted = output<void>();
 
-  public constructor() {
+  constructor() {
     effect(() => {
       if (this.todo()) {
         this.form.patchValue(this.todo()!);
       } else {
-        this.form.reset({
-          summary: '',
-          description: '',
-          priority: PRIORITY.MEDIUM,
-          completeBy: '',
-        });
+        this.form.reset();
       }
     });
   }
 
-  public hasError(controlName: keyof typeof this.form.controls): boolean {
-    const control = this.form.controls[controlName];
+  protected hasError(controlName: keyof typeof this.form.controls): boolean {
+    const control = this.form.get(controlName);
 
-    return control.invalid && (control.dirty || control.touched);
+    if (!control) return false;
+
+    return control.invalid && !control.pending && (control.dirty || control.touched);
   }
 
-  public getErrorMessage(controlName: keyof typeof this.form.controls): string {
-    const control = this.form.controls[controlName];
+  protected getErrorMessage(controlName: keyof typeof this.form.controls): string {
+    const control = this.form.get(controlName);
 
-    if (!control.errors) return '';
+    if (!control) return '';
 
-    if (control.errors?.['required']) return 'This field is required.';
-    if (control.errors?.['maxlength'])
-      return `Maximum length is ${control.errors['maxlength'].requiredLength} characters.`;
-    if (control.errors?.['pastDate']) return 'The date cannot be in the past.';
+    if (control.hasError('required')) return 'This field is required.';
+
+    if (control.hasError('maxlength'))
+      return `Maximum length is ${control.getError('maxlength')?.requiredLength} characters.`;
+
+    if (control.hasError('pastDate')) return 'The date cannot be in the past.';
 
     return 'Invalid field.';
   }
 
-  public async submit(): Promise<void> {
-    if (this.form.invalid) return;
+  protected async submit(): Promise<void> {
+    if (this.form.invalid || this.form.pending) return;
 
     const value = {
       ...this.form.getRawValue(),
       completeBy:
-        this.form.value.completeBy || new Date(Date.now() + 3 * DAY).toISOString().slice(0, 16),
+        this.form.value.completeBy ||
+        new Date(Date.now() + 3 * minute_per_day * ms_per_minute).toISOString(),
     };
 
     if (this.todo()) {
@@ -83,6 +79,6 @@ export class TodoForm {
       await this.#store.create(value);
     }
 
-    this.done.emit();
+    this.formSubmitted.emit();
   }
 }
