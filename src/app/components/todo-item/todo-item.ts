@@ -12,8 +12,8 @@ import { day } from '../../constant';
 export class TodoItem {
   readonly #store = inject(TodoService);
 
-  protected readonly item = input.required<TodoModel>();
-  protected readonly completed = input(false);
+  public readonly item = input.required<TodoModel>();
+  public readonly completed = input(false);
 
   protected readonly edit = output<void>();
 

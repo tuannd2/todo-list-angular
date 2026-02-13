@@ -1,7 +1,8 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { TodoService } from '../../services/todo.service';
 import { TodoItem } from '../todo-item/todo-item';
 import { TodoFormComponent } from '../todo-form/todo-form';
+import { todoSortFn } from '../../utils/todo.utils';
 
 @Component({
   selector: 'app-todo-list',
@@ -12,8 +13,16 @@ import { TodoFormComponent } from '../todo-form/todo-form';
 export class TodoList {
   readonly #store = inject(TodoService);
 
-  protected readonly unfinishedItems$ = this.#store.unfinishedItems$;
-  protected readonly finishedItems$ = this.#store.finishedItems$;
+  public readonly unfinishedItems$ = computed(() =>
+    this.#store
+      .items$()
+      .filter((i) => !i.isCompleted)
+      .sort(todoSortFn),
+  );
+
+  public readonly finishedItems$ = computed(() =>
+    this.#store.items$().filter((i) => i.isCompleted),
+  );
   protected readonly editingId$ = signal<string | null>(null);
   protected readonly isCreating$ = signal<boolean>(false);
 

@@ -1,10 +1,10 @@
 import { Component, effect, inject, input, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TodoService } from '../../services/todo.service';
-import { TodoModel } from '../../models/todo.model';
 import { validateNotPastDate } from '../../validators/not-past-date.validator';
-import { Priority, priority } from '../../models/priority.model';
 import { day } from '../../constant';
+import { TodoModel } from '../../models/todo.model';
+import { priority, Priority } from '../../models/priority.model';
 
 @Component({
   selector: 'app-todo-form',
@@ -17,20 +17,18 @@ export class TodoFormComponent {
   readonly #store = inject(TodoService);
 
   protected readonly isSubmitting = this.#store.isLoading$();
-  protected readonly form = this.#fb.nonNullable.group(
-    {
-      summary: ['', [Validators.required, Validators.maxLength(30)]],
-      description: [''],
-      priority: [priority.MEDIUM as Priority],
-      completeBy: ['', [validateNotPastDate]],
-    },
-  );
+  protected readonly form = this.#fb.nonNullable.group({
+    summary: ['', [Validators.required, Validators.maxLength(30)]],
+    description: [''],
+    priority: [priority.MEDIUM as Priority],
+    completeBy: ['', [validateNotPastDate]],
+  });
 
   protected PRIORITY = priority;
 
-  protected todo = input<TodoModel | null>(null);
+  public todo = input<TodoModel | null>(null);
 
-  protected formSubmitted = output<void>();
+  public formSubmitted = output<void>();
 
   constructor() {
     effect(() => {
@@ -43,7 +41,9 @@ export class TodoFormComponent {
   }
 
   protected hasError(controlName: keyof typeof this.form.controls): boolean {
-    const control = this.form.controls[controlName];
+    const control = this.form.get(controlName);
+
+    if (!control) return false;
 
     return control.invalid && !control.pending && (control.dirty || control.touched);
   }
