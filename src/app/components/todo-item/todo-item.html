@@ -14,12 +14,12 @@
         @if (!item().isCompleted) {
         <button title="edit" class="actions-btn" (click)="startEdit()">✎</button>
         <button title="complete" class="actions-btn" (click)="markCompleted()">✔</button>
-        <button title="delete" class="actions-btn" (click)="deleteItem()">✖</button>
+        <button title="delete" class="actions-btn" (click)="deleteItem($event)">✖</button>
 
         }
     </div>
 
     @if (item().isCompleted) {
-    <button title="undo" class="actions-btn undo-btn" (click)="undoCompleted()">↩</button>
+    <button title="undo" class="actions-btn undo-btn" (click)="undoCompleted($event)">↩</button>
     }
 </div>

@@ -39,12 +39,12 @@ export class TodoItem {
     this.edit.emit();
   }
 
-  protected deleteItem(): void {
-    this.#store.delete(this.item().id);
+  protected deleteItem($event: MouseEvent): void {
+    this.#store.delete($event, this.item().id);
   }
 
-  protected undoCompleted(): void {
-    this.#store.undoCompleted(this.item().id);
+  protected undoCompleted($event: MouseEvent): void {
+    this.#store.undoCompleted($event, this.item().id);
   }
 
   protected markCompleted(): void {

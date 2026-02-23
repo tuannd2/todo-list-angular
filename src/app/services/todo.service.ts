@@ -10,7 +10,8 @@ import { TodoStorageService } from './todo-storage.service';
 })
 export class TodoService {
   readonly #items$ = signal<TodoModel[]>([]);
-  readonly #isLoading$ = signal(false);
+  readonly #isLoading$ = signal<boolean>(false);
+  #isOperating = false;
 
   public readonly isLoading$ = this.#isLoading$.asReadonly();
   public readonly items$ = this.#items$.asReadonly();
@@ -45,13 +46,17 @@ export class TodoService {
     await this.update(id, { isCompleted: true });
   }
 
-  public async undoCompleted(id: string): Promise<void> {
+  public async undoCompleted(event: MouseEvent, id: string): Promise<void> {
+    (event.target as HTMLElement)?.blur();
+
     if (confirm('Are you sure you want to mark this item as unfinished?')) {
       await this.update(id, { isCompleted: false });
     }
   }
 
-  public async delete(id: string): Promise<void> {
+  public async delete(event: MouseEvent, id: string): Promise<void> {
+    (event.target as HTMLElement)?.blur();
+
     if (confirm('Are you sure you want to delete this item?')) {
       await this.#operation(() => {
         this.#items$.update((items) => items.filter((i) => i.id !== id));
@@ -64,17 +69,23 @@ export class TodoService {
   }
 
   #operation(fn: () => void): Promise<void> {
+    if (this.#isOperating) return Promise.resolve();
+
     return (async (): Promise<void> => {
       try {
+        this.#isOperating = true;
         this.#isLoading$.set(true);
+
         await this.#delay();
         fn();
+
         this.toastService.show('Saved!', 'success');
       } catch (error) {
         console.error(error);
         this.toastService.show('Something went wrong!', 'error');
       } finally {
         this.#isLoading$.set(false);
+        this.#isOperating = false;
       }
     })();
   }
